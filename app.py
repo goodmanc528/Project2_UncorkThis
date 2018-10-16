@@ -54,13 +54,12 @@ def names():
 def sample_metadata(winery):
     """Return the MetaData for a given sample."""
     sel = [
+        Wineries.ID,
         Wineries.winery,
         Wineries.country_id,
         Wineries.province_id,
-        Wineries.AGE,
-        Wineries.LOCATION,
-        Wineries.BBTYPE,
-        Wineries.WFREQ,
+
+
     ]
 
     results = db.session.query(*sel).filter(Wineries.winery == winery).all()
@@ -75,6 +74,7 @@ def sample_metadata(winery):
     print(sample_metadata)
     return jsonify(sample_metadata)
 
+@app.route("")
 
 # @app.route("/samples/<sample>")
 # def samples(sample):
