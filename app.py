@@ -18,7 +18,7 @@ app = Flask(__name__)
 # Database Setup
 #################################################
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db/winetasting.sqlite"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///winetasting.sqlite"
 db = SQLAlchemy(app)
 
 # reflect an existing database into a new model
@@ -27,10 +27,10 @@ Base = automap_base()
 Base.prepare(db.engine, reflect=True)
 
 # Save references to each table
-Countries = Base.classes.countries
+# Countries = Base.classes.countries
 Provinces = Base.classes.provinces
-Wineries = Base.classes.wineries
-Wines = Base.classes.wines
+# Wineries = Base.classes.wineries
+# Wines = Base.classes.wines
 
 @app.route("/")
 def index():
@@ -38,48 +38,72 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/provinces")
-def names():
+@app.route("/simple")
+def province():
     """Return a list of sample names."""
 
     # Use Pandas to perform the sql query
-    stmt = db.session.query(Wineries).statement
+    stmt = db.session.query(Provinces).statement
     df = pd.read_sql_query(stmt, db.session.bind)
+    return jsonify(list(df.rows)[2:])
+    # Return a list of the column names (provinces)
+    # return jsonify(list(df.columns)[1:])
 
-    # Return a list of the column names (sample names)
-    return jsonify(list(df.rows)[1:])
+@app.route("/test")
+def test():
+    var = "Hello.  I came from app.py"
+    print(var)
+    return var
+
+# @app.route("/wineries/<winery>")
+# def sample_metadata(winery):
+#     """Return the MetaData for a given sample."""
+#     sel = [
+#         Wineries.ID,
+#         Wineries.winery,
+#         Wineries.country_id,
+#         Wineries.province_id,
 
 
-@app.route("/wineries/<winery>")
-def sample_metadata(winery):
-    """Return the MetaData for a given sample."""
-    sel = [
-        Wineries.ID,
-        Wineries.winery,
-        Wineries.country_id,
-        Wineries.province_id,
+#     ]
 
+#     results = db.session.query(*sel).filter(Wineries.winery == winery).all()
 
-    ]
+#     # Create a dictionary entry for each row of metadata information
+#     sample_metadata = {}
+#     for result in results:
+#         sample_metadata["Winery"] = result[1]
+#         sample_metadata["Country ID"] = result[2]
+#         sample_metadata["Province ID"] = result[3]
 
-    results = db.session.query(*sel).filter(Wineries.winery == winery).all()
+#     print(sample_metadata)
+#     return jsonify(sample_metadata)
 
-    # Create a dictionary entry for each row of metadata information
-    sample_metadata = {}
-    for result in results:
-        sample_metadata["Winery"] = result[1]
-        sample_metadata["Country ID"] = result[2]
-        sample_metadata["Province ID"] = result[3]
+# @app.route("api/<province>")
+# def price_rating(province):
+#     """return the data needed to plot price, rating nad type for specified province"""
+#     # selWine = [
+#     #     Wines.title,
+#     #     Wines.price,
+#     #     Wines.Rating,
+#     #     Wines.variety,
+#     #     Wines.province_id
+#     # ]
+#     selProvince = [
+#         Provinces.id,
+#         Provinces.province
+#     ]
 
-    print(sample_metadata)
-    return jsonify(sample_metadata)
+#     # results  = db.session.query(selWine, selProvince).filter(Provinces.province = provinces).filter(Provinces.id = Wines.province_id).all()
+#     results  = db.session.query(selProvince).filter(Provinces.province = provinces)
 
-@app.route("/wines/<provinces>")
-def price_rating(province):
-    """return the data needed to plot price, rating nad type for specified province"""
-    sel = [
-        
-    ]
+#     price_ratings = {}
+#     for result in results :
+#         price_ratings["Wine_Name"] = result[1]
+#         price_ratings["Province"] = result[7]
+#     print(price_ratings)
+#     return jsonify(price_ratings)
+    # provinceResults = db.session.query_property(selProvince).filter(Provinces.id = provinceID).all()
 # @app.route("/samples/<sample>")
 # def samples(sample):
 #     """Return `otu_ids`, `otu_labels`,and `sample_values`."""
@@ -97,5 +121,5 @@ def price_rating(province):
 #     }
 #     return jsonify(data)
 
-# if __name__ == "__main__":
-#     app.run()
+if __name__ == "__main__":
+    app.run()
