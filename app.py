@@ -75,8 +75,11 @@ def sample_metadata(winery):
     return jsonify(sample_metadata)
 
 @app.route("/wines/<provinces>")
-def 
-
+def price_rating(province):
+    """return the data needed to plot price, rating nad type for specified province"""
+    sel = [
+        
+    ]
 # @app.route("/samples/<sample>")
 # def samples(sample):
 #     """Return `otu_ids`, `otu_labels`,and `sample_values`."""
