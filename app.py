@@ -74,7 +74,8 @@ def sample_metadata(winery):
     print(sample_metadata)
     return jsonify(sample_metadata)
 
-@app.route("")
+@app.route("/wines/<provinces>")
+def 
 
 # @app.route("/samples/<sample>")
 # def samples(sample):
