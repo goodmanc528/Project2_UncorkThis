@@ -32,15 +32,18 @@ provinces = Base.classes.provinces
 wineries = Base.classes.wineries
 wines = Base.classes.wines
 
+
 @app.route("/")
 def index():
     """Return the homepage."""
     return render_template("index.html")
 
-@app.route("/map/")
+
+@app.route("/map")
 def map():
     """Return the homepage."""
     return render_template("map.html")
+
 
 @app.route("/names")
 def names():
