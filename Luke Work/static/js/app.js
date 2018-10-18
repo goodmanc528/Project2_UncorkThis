@@ -1,7 +1,7 @@
-function buildMetadata(sample) {
+function buildMetadata(id) {
   // @TODO: Complete the following function that builds the metadata panel
   // Use `d3.json` to fetch the metadata for a sample
-  var url = `/wineries/${sample}`;
+  var url = `/wineries/${id}`;
     // Use d3 to select the panel with id of `#sample-metadata`
     d3.json(url).then(function(sample) {
       var sample_metadata = d3.select("#sample-metadata");
@@ -19,7 +19,7 @@ function buildMetadata(sample) {
 function buildCharts(sample) {
 
   // @TODO: Use `d3.json` to fetch the sample data for the plots
-    var url = `/samples/${sample}`;
+    var url = `/wines/${sample}`;
     // @TODO: Build a Bubble Chart using the sample data
     d3.json(url).then(function(data) {
       var bubX = data.otu_ids;
