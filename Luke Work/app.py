@@ -37,6 +37,10 @@ def index():
     """Return the homepage."""
     return render_template("index.html")
 
+@app.route("/map/")
+def map():
+    """Return the homepage."""
+    return render_template("map.html")
 
 @app.route("/names")
 def names():
@@ -51,8 +55,8 @@ def names():
     return jsonify(provinceVar)
 
 
-@app.route("/wineries")
-def sample_metadata():
+@app.route("/wineries/<id>")
+def sample_metadata(sample):
 
     sql_cmd = sqlalchemy.text('''
     SELECT wineries.winery, wines.title
