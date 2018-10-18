@@ -1,7 +1,7 @@
-function buildMetadata(id) {
+function buildMetadata(sample) {
   // @TODO: Complete the following function that builds the metadata panel
   // Use `d3.json` to fetch the metadata for a sample
-  var url = `/wineries/${id}`;
+  var url = `/metadata/${sample}`;
     // Use d3 to select the panel with id of `#sample-metadata`
     d3.json(url).then(function(sample) {
       var sample_metadata = d3.select("#sample-metadata");
@@ -19,14 +19,14 @@ function buildMetadata(id) {
 function buildCharts(sample) {
 
   // @TODO: Use `d3.json` to fetch the sample data for the plots
-    var url = `/wines/${sample}`;
+    var url = `/samples/${sample}`;
     // @TODO: Build a Bubble Chart using the sample data
     d3.json(url).then(function(data) {
-      var bubX = data.otu_ids;
-      var bubY = data.sample_values;
-      var m_size = data.sample_values;
-      var m_color = data.otu_ids;
-      var textValue = data.otu_labels;
+      var bubX = data.points;
+      var bubY = data.price;
+      var m_size = data.price;
+      var m_color = data.points;
+      var textValue = data.varieties;
       
       var trace1 = {
         x: bubX,
@@ -49,13 +49,13 @@ function buildCharts(sample) {
       Plotly.newPlot('bubble', data, layout);      
 
     // @TODO: Build a Pie Chart
-    // HINT: You will need to use slice() to grab the top 10 sample_values,
-    // otu_ids, and labels (10 each).
+    // HINT: You will need to use slice() to grab the top 10 price,
+    // points, and labels (10 each).
 
     d3.json(url).then(function(data)  {
-      var pie_values = data.sample_values.slice(0,10)
-      var pie_labels = data.otu_ids.slice(0,10)
-      var pie_hover = data.otu_labels.slice(0,10)
+      var pie_values = data.price.slice(0,10)
+      var pie_labels = data.points.slice(0,10)
+      var pie_hover = data.varieties.slice(0,10)
       var data = [{
         type: "pie",
         hoverinfo: pie_hover,

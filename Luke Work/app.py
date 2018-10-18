@@ -45,49 +45,46 @@ def map():
 @app.route("/names")
 def names():
     """Return a list of sample names."""
-    print("Names is working")
+
     # Use Pandas to perform the sql query
     stmt = db.session.query(provinces).statement
     df = pd.read_sql_query(stmt, db.session.bind)
-    print(df)
     # Return a list of the column names (sample names)
     provinceVar = (df["province"].tolist())
     return jsonify(provinceVar)
 
 
-@app.route("/wineries/<id>")
+@app.route("/metadata/<sample>")
 def sample_metadata(sample):
 
     sql_cmd = sqlalchemy.text('''
-    SELECT wineries.winery, wines.title
+    SELECT wineries.winery, avg(wines.price), avg(wines.points)
     FROM wineries INNER JOIN wines 
     ON wines.winery_id = wineries.id
+    GROUP BY wineries.id
     ''')
-    results = db.execute(sql_cmd).fetchall()
-    print(results)
+    
 
     # """Return the MetaData for a given sample."""
     results = [
         wineries.winery,
-        wineries.country_id,
-        wineries.province_id,
-        wines.winery_id,
-        wines.title,
-        wines.variety,
-        wines.price,
-        wines.points,
+        # wineries.country_id,
+        # wineries.province_id,
+        # wines.winery_id,
+        # wines.title,
+        # wines.variety,
+        # wines.price,
+        # wines.points,
     ]
+    results = db.engine.execute(sql_cmd).fetchall()
+    print(results)
+
     # Create a dictionary entry for each row of metadata information
     sample_metadata = {}
     for result in results:
-        sample_metadata["Winery"] = result[1]
-        sample_metadata["Country ID"] = result[2]
-        sample_metadata["Province ID"] = result[3]
-        sample_metadata["Winery ID"] = result[4]
-        sample_metadata["Title"] = result[5]
-        sample_metadata["Variety"] = result[6]
-        sample_metadata["Price"] = result[7]
-        sample_metadata["Points"] = result[8]
+        sample_metadata["Winery"] = result[0]
+        sample_metadata["Price"] = result[1]
+        sample_metadata["Points"] = result[2]
 
     print(sample_metadata)
     return jsonify(sample_metadata)
