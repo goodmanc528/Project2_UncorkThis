@@ -63,28 +63,35 @@ function createMap(layer, coords = parisCoords, zoom = mapZoomLevel) {
     layer.addTo(myMap);
 
     // create a legend
-    var legend = L.control({ position: 'topright' });
+    var legend = L.control({ position: 'bottomright' });
 
     legend.onAdd = function (map) {
 
         var div = L.DomUtil.create('div', 'info legend'),
-            grades = [0, 85, 90, 95, 99, 100],
+            points = [80, 85, 90, 95, 99, 100],
             labels = [];
-
+        console.log(points);
         // loop through our density intervals and generate a label with a colored square for each interval
-        for (var i = 0; i < grades.length; i++) {
+        for (var i = 0; i < points.length; i++) {
             div.innerHTML +=
-                '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
-                grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+                '<i style="background:' + getColor(points[i] + 1) + '"></i> ' +
+                points[i] + (points[i + 1] ? '&ndash;' + points[i + 1] + '<br>' : '+');
         }
 
         return div;
     };
 
-    legend.addTo(map);
+    legend.addTo(myMap);
+}
 
-
-
+// colors for legend
+function getColor(d) {
+    return d > 100 ? '#0000FF' :
+        d > 95 ? '#41D429' :
+            d > 90 ? '#FFF300' :
+                d > 85 ? '#FF8300' :
+                    d > 80 ? '#FF0000' :
+                        '#000000';
 }
 
 // Create the createMarkers function
