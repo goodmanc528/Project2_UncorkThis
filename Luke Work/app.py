@@ -71,8 +71,8 @@ def sample_metadata(province):
     sample_metadata = {}
     for result in results:
         sample_metadata["Province"] = result[2]
-        sample_metadata["Average Price"] = result[0]
-        sample_metadata["Average Rating in Points"] = result[1]
+        sample_metadata["Average Price"] = "$" + f"{result[0]:.2f}"
+        sample_metadata["Average Rating in Points"] = f"{result[1]:.0f}"
     print(sample_metadata)
     return jsonify(sample_metadata)
 
