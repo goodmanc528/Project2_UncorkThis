@@ -68,7 +68,7 @@ function createMap(layer, coords = parisCoords, zoom = mapZoomLevel) {
     legend.onAdd = function (map) {
 
         var div = L.DomUtil.create('div', 'info legend'),
-            points = [80, 85, 90, 95, 99, 100],
+            points = [80, 85, 90, 95, 100],
             labels = [];
         console.log(points);
         // loop through our density intervals and generate a label with a colored square for each interval
