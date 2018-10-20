@@ -63,12 +63,11 @@ def sample_metadata(province):
     SELECT avg(wines.price) as averageprice, avg(wines.points) as points, provinces.province as province
     FROM wines INNER JOIN provinces
     ON wines.province_id = provinces.id
-    where provinces.province = "{}"
+    WHERE provinces.province = "{}"
     GROUP BY province    
     '''.format(province))
-    # results = db.session.query(*sql_cmd).filter(wines.province_id == province).all()
+
     results = db.engine.execute(sql_cmd).fetchall()
-    print(results)
 
     # Create a dictionary entry for each row of metadata information
     sample_metadata = {}
@@ -80,22 +79,27 @@ def sample_metadata(province):
     return jsonify(sample_metadata)
 
 
-# @app.route("/samples/<sample>")
-# def samples(sample):
-#     """Return `otu_ids`, `otu_labels`,and `sample_values`."""
-#     stmt = db.session.query(Samples).statement
-#     df = pd.read_sql_query(stmt, db.session.bind)
+@app.route("/samples/<wines>")
+def samples(wines):
 
-#     # Filter the data based on the sample number and
-#     # only keep rows with values above 1
-#     sample_data = df.loc[df[sample] > 1, ["otu_id", "otu_label", sample]]
-#     # Format the data to send as json
-#     data = {
-#         "otu_ids": sample_data.otu_id.values.tolist(),
-#         "sample_values": sample_data[sample].values.tolist(),
-#         "otu_labels": sample_data.otu_label.tolist(),
-#     }
-#     return jsonify(data)
+    sql_cmd = sqlalchemy.text('''
+    SELECT avg(wines.price) as averageprice, avg(wines.points) as points, provinces.province as province
+    FROM wines INNER JOIN provinces
+    ON wines.province_id = provinces.id
+    WHERE provinces.province = "{}"
+    GROUP BY province    
+    '''.format(wines))
+
+    results = db.engine.execute(sql_cmd).fetchall()
+
+    # sample_data = df.loc[df[wines] > 1, ["Prices", "Points", wines]]
+    data = {
+        "Prices": results.price.values.tolist(),
+        "Provinces": results[wines].values.tolist(),
+        "Points": results.points.tolist(),
+    }
+    print(results)
+    return jsonify(data)
 
 if __name__ == "__main__":
     app.run(debug=True)
