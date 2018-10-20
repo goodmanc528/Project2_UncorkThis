@@ -27,9 +27,13 @@ function buildCharts(province) {
     for (i = 0; i < provinceLength.length; i++) {
       xLength.push(i)
     };
-    var bubX = data.Provinces;
+    var bubX = data.Points;
     var bubY = data.Prices;
-    var m_size = data.Count;
+    var adjCount = data.Count.map(function (e) {
+      e = Math.log1p(e) * 2;
+      return e;
+    });
+    var m_size = adjCount;
 
     var textValue = data.Provinces;
 
@@ -47,12 +51,26 @@ function buildCharts(province) {
     var layout = {
       title: 'Average Price and Point by Province',
       yaxis: {
-        "title": "Average Price"
+        "title": "Average Price",
+        range: [0, 100]
       },
       xaxis: {
         tickangle: 35,
       },
-      showlegend: false
+      hovermode: 'closest',
+      autosize: false,
+      showlegend: false,
+      width: 1200,
+      height: 600,
+      margin: {
+        l: 50,
+        r: 50,
+        b: 100,
+        t: 100,
+        pad: 4
+      },
+      paper_bgcolor: '#E1C56C',
+      plot_bgcolor: '#FFFFFF'
     };
     Plotly.newPlot('bubble', data, layout);
   });
