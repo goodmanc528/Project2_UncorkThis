@@ -52,7 +52,6 @@ def names():
     df = pd.read_sql_query(stmt, db.session.bind)
 
     provinceVar = (df["province"].tolist())
-    print(provinceVar)
     return jsonify(provinceVar)
 
 
@@ -75,30 +74,31 @@ def sample_metadata(province):
         sample_metadata["Province"] = result[2]
         sample_metadata["Average Price"] = "$" + f"{result[0]:.2f}"
         sample_metadata["Average Rating in Points"] = f"{result[1]:.0f}"
-    print(sample_metadata)
+    # print(sample_metadata)
     return jsonify(sample_metadata)
 
 
-@app.route("/samples/<wines>")
-def samples(wines):
+@app.route("/samples/<province>")
+def samples(province):
 
     sql_cmd = sqlalchemy.text('''
     SELECT avg(wines.price) as averageprice, avg(wines.points) as points, provinces.province as province
     FROM wines INNER JOIN provinces
     ON wines.province_id = provinces.id
-    WHERE provinces.province = "{}"
     GROUP BY province    
-    '''.format(wines))
+    '''.format(province))
 
-    results = db.engine.execute(sql_cmd).fetchall()
+    # results = db.engine.execute(sql_cmd).fetchall()
+    # stmt = db.session.query(results).statement
+    df = pd.read_sql_query(sql_cmd, db.session.bind)
+    # sample_data = df.loc["Average Price", "Average Rating in Points", province]
 
-    # sample_data = df.loc[df[wines] > 1, ["Prices", "Points", wines]]
     data = {
-        "Prices": results.price.values.tolist(),
-        "Provinces": results[wines].values.tolist(),
-        "Points": results.points.tolist(),
+        "Prices": df["averageprice"].values.tolist(),
+        "Provinces": df["province"].values.tolist(),
+        "Points": df["points"].values.tolist(),
     }
-    print(results)
+    print(data)
     return jsonify(data)
 
 if __name__ == "__main__":
