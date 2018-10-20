@@ -30,15 +30,18 @@ Base.prepare(db.engine, reflect=True)
 provinces = Base.classes.provinces
 wines = Base.classes.wines
 
+
 @app.route("/")
 def index():
     """Return the homepage."""
     return render_template("index.html")
 
-@app.route("/map/")
+
+@app.route("/map")
 def map():
     """Return the homepage."""
     return render_template("map.html")
+
 
 @app.route("/names")
 def names():
