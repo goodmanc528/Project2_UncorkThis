@@ -3,7 +3,7 @@ var queryUrl = "/wines";
 var wines;
 // Perform a GET request to the query URL
 d3.json(queryUrl, function (data) {
-    // Once we get a response, send the data.features object to the createFeatures function
+    // Once we get a response, send the data object to the createMarkers function
     createMarkers(data);
 });
 
@@ -11,9 +11,9 @@ d3.json(queryUrl, function (data) {
 var newYorkCoords = [40.73, -74.0059];
 var parisCoords = [48.864716, 2.349014];
 var brazilCoords = [-22.970722, -43.182365];
-var mapZoomLevel = 12;
+var mapZoomLevel = 5;
 // Create the createMap function
-function createMap(layer, coords = newYorkCoords, zoom = mapZoomLevel) {
+function createMap(layer, coords = parisCoords, zoom = mapZoomLevel) {
     // base tile layers
     var streetmap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
         attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
@@ -58,13 +58,15 @@ function createMap(layer, coords = newYorkCoords, zoom = mapZoomLevel) {
 
     // Create a layer control, pass in the baseMaps and overlayMaps. Add the layer control to the map
     L.control.layers(baseMaps, overlayMaps, { collapsed: false }).addTo(myMap);
+
+    // default the wine layer active
+    layer.addTo(myMap);
 }
 
 // Create the createMarkers function
 function createMarkers(json) {
 
-    // Pull the "stations" property off of response.data
-    console.log(json);
+    // set the json file to a variable
     wines = json;
 
     // Initialize an array to hold bike markers
@@ -141,13 +143,12 @@ function createMarkers(json) {
     var wineMarkers = [];
 
     // Loop through the wines array
-    console.log(wines);
     wines.forEach(wine => {
-        // For each station, create a marker and bind a popup with the station's name
+        // For each wine, create a marker
         var marker = new PruneCluster.Marker(wine.lat, wine.lon);
-        marker.name = wine.name;
-        marker.rating = wine.rating;
-        marker.price = wine.price;
+        marker.data.name = wine.name;
+        marker.data.rating = wine.rating;
+        marker.data.price = wine.price;
         wineMarkers.push(marker);
         if (wine.rating < 100) {
             marker.category = 4;
@@ -163,8 +164,6 @@ function createMarkers(json) {
         wineView.RegisterMarker(marker);
     });
 
-    // Create a layer group made from the bike markers array, pass it into the createMap function
-    // var wineLayer = L.layerGroup(wineView);
-    // console.log(wineMarkers);
+    // pass the markers layer to the createMap function
     createMap(wineView);
 }

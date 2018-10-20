@@ -99,7 +99,6 @@ def wine_data():
                       "lat": result[4],
                       "lon": result[3]
                       })
-    print(wines)
     return jsonify(wines)
 
 # @app.route("/samples/<sample>")
