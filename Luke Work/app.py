@@ -98,7 +98,6 @@ def samples(province):
         "Provinces": df["province"].values.tolist(),
         "Points": df["points"].values.tolist(),
     }
-    print(data)
     return jsonify(data)
 
 if __name__ == "__main__":

@@ -1,5 +1,13 @@
-// starting settings for leaflet
+// Flask query for data
+var queryUrl = "/wines";
+var wines;
+// Perform a GET request to the query URL
+d3.json(queryUrl, function (data) {
+    // Once we get a response, send the data.features object to the createFeatures function
+    createMarkers(data);
+});
 
+// starting settings for leaflet
 var newYorkCoords = [40.73, -74.0059];
 var parisCoords = [48.864716, 2.349014];
 var brazilCoords = [-22.970722, -43.182365];
@@ -56,7 +64,8 @@ function createMap(layer, coords = newYorkCoords, zoom = mapZoomLevel) {
 function createMarkers(json) {
 
     // Pull the "stations" property off of response.data
-    var wines = json.wines;
+    console.log(json);
+    wines = json;
 
     // Initialize an array to hold bike markers
     var wineView = new PruneClusterForLeaflet();
@@ -69,7 +78,7 @@ function createMarkers(json) {
         return e;
     };
     // colors
-    var colors = ['#ff4b00', '#bac900', '#EC1813', '#55BCBE', '#D2204C'];
+    var colors = ['#FF0000', '#FF8300', '#FFF300', '#41D429', '#0000FF'];
     var pi2 = Math.PI * 2;
 
 
@@ -131,13 +140,14 @@ function createMarkers(json) {
 
     var wineMarkers = [];
 
-    // Loop through the stations array
+    // Loop through the wines array
+    console.log(wines);
     wines.forEach(wine => {
         // For each station, create a marker and bind a popup with the station's name
         var marker = new PruneCluster.Marker(wine.lat, wine.lon);
-        marker.data.name = wine.name;
-        marker.data.rating = wine.rating;
-        marker.data.price = wine.price;
+        marker.name = wine.name;
+        marker.rating = wine.rating;
+        marker.price = wine.price;
         wineMarkers.push(marker);
         if (wine.rating < 100) {
             marker.category = 4;
@@ -158,46 +168,3 @@ function createMarkers(json) {
     // console.log(wineMarkers);
     createMap(wineView);
 }
-
-json = {
-    wines: [
-        {
-            name: 'wine 1',
-            rating: 98,
-            price: 14,
-            lat: 40.73,
-            lon: -74.0059
-        },
-        {
-            name: 'wine 2',
-            rating: 84,
-            price: 22,
-            lat: 40.73,
-            lon: -74.0059
-        },
-        {
-            name: 'wine 3',
-            rating: 86,
-            price: 10,
-            lat: 40.73,
-            lon: -74.0059
-        },
-        {
-            name: 'wine 4',
-            rating: 96,
-            price: 12,
-            lat: 40.73,
-            lon: -74.0059
-        },
-        {
-            name: 'wine 5',
-            rating: 89,
-            price: 11,
-            lat: 40.73,
-            lon: -74.0059
-        }
-    ]
-};
-
-
-createMarkers(json);

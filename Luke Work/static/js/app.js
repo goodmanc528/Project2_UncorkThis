@@ -69,7 +69,6 @@ function buildCharts(wines) {
     });
 };
 
-
 function optionChanged(newProvince) {
   // Fetch new data each time a new sample is selected
   buildCharts(newProvince);
