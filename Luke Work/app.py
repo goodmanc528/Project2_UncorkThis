@@ -63,12 +63,11 @@ def sample_metadata(province):
     SELECT avg(wines.price) as averageprice, avg(wines.points) as points, provinces.province as province
     FROM wines INNER JOIN provinces
     ON wines.province_id = provinces.id
-    where provinces.province = "{}"
+    WHERE provinces.province = "{}"
     GROUP BY province    
     '''.format(province))
-    # results = db.session.query(*sql_cmd).filter(wines.province_id == province).all()
+
     results = db.engine.execute(sql_cmd).fetchall()
-    print(results)
 
     # Create a dictionary entry for each row of metadata information
     sample_metadata = {}

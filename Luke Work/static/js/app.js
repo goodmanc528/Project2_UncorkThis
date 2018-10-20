@@ -17,10 +17,10 @@ function buildMetadata(wines) {
       });
     });
 };
-function buildCharts(sample) {
+function buildCharts(wines) {
 
   // @TODO: Use `d3.json` to fetch the sample data for the plots
-    var url = `/samples/${sample}`;
+    var url = `/samples/${wines}`;
     // @TODO: Build a Bubble Chart using the sample data
     d3.json(url).then(function(data) {
       var bubX = data.points;
@@ -42,7 +42,7 @@ function buildCharts(sample) {
       var data = [trace1];
 
       var layout = {
-        title: 'Average Price',
+        title: 'Wines & Stuff',
         showlegend: false
         };
       
@@ -67,7 +67,6 @@ function buildCharts(sample) {
       Plotly.newPlot("pie", data);
       });
     });
-// ACTIVITY 15-2-7
 };
 
 
