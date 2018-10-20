@@ -81,7 +81,7 @@ def sample_metadata(province):
 
 @app.route("/wines")
 def wine_data():
-
+    # blocker
     sql_cmd = sqlalchemy.text('''
     SELECT wines.title, wines.points, wines.price, provinces.pro_lon, provinces.pro_lat
     FROM wines INNER JOIN provinces
