@@ -106,11 +106,11 @@ def wine_data():
 def samples(province):
 
     sql_cmd = sqlalchemy.text('''
-    SELECT avg(wines.price) as averageprice, avg(wines.points) as points, provinces.province as province
-    FROM wines INNER JOIN provinces
-    ON wines.province_id = provinces.id
-    GROUP BY province
-    ''')
+   SELECT avg(wines.price) as averageprice, avg(wines.points) as points, provinces.province as province, count(wines.points) as count
+   FROM wines INNER JOIN provinces
+   ON wines.province_id = provinces.id
+   GROUP BY province
+   ''')
 
     df = pd.read_sql_query(sql_cmd, db.session.bind)
 
@@ -118,6 +118,7 @@ def samples(province):
         "Prices": df["averageprice"].values.tolist(),
         "Provinces": df["province"].values.tolist(),
         "Points": df["points"].values.tolist(),
+        "Count": df["count"].values.tolist(),
     }
     print(data)
     return jsonify(data)
