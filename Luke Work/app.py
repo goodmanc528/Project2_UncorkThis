@@ -27,9 +27,7 @@ Base = automap_base()
 Base.prepare(db.engine, reflect=True)
 
 # Save references to each table
-countries = Base.classes.countries
 provinces = Base.classes.provinces
-wineries = Base.classes.wineries
 wines = Base.classes.wines
 
 @app.route("/")
@@ -44,48 +42,37 @@ def map():
 
 @app.route("/names")
 def names():
-    """Return a list of sample names."""
+    """Return a list of province names."""
 
     # Use Pandas to perform the sql query
     stmt = db.session.query(provinces).statement
     df = pd.read_sql_query(stmt, db.session.bind)
-    # Return a list of the column names (sample names)
+
     provinceVar = (df["province"].tolist())
+    print(provinceVar)
     return jsonify(provinceVar)
 
 
-@app.route("/metadata/<sample>")
-def sample_metadata(sample):
+@app.route("/metadata/<province>")
+def sample_metadata(province):
 
     sql_cmd = sqlalchemy.text('''
-    SELECT wineries.winery, avg(wines.price), avg(wines.points)
-    FROM wineries INNER JOIN wines 
-    ON wines.winery_id = wineries.id
-    GROUP BY wineries.id
-    ''')
-    
-
-    # """Return the MetaData for a given sample."""
-    results = [
-        wineries.winery,
-        # wineries.country_id,
-        # wineries.province_id,
-        # wines.winery_id,
-        # wines.title,
-        # wines.variety,
-        # wines.price,
-        # wines.points,
-    ]
+    SELECT avg(wines.price) as averageprice, avg(wines.points) as points, provinces.province as province
+    FROM wines INNER JOIN provinces
+    ON wines.province_id = provinces.id
+    where provinces.province = "{}"
+    GROUP BY province    
+    '''.format(province))
+    # results = db.session.query(*sql_cmd).filter(wines.province_id == province).all()
     results = db.engine.execute(sql_cmd).fetchall()
     print(results)
 
     # Create a dictionary entry for each row of metadata information
     sample_metadata = {}
     for result in results:
-        sample_metadata["Winery"] = result[0]
-        sample_metadata["Price"] = result[1]
-        sample_metadata["Points"] = result[2]
-
+        sample_metadata["Province"] = result[2]
+        sample_metadata["Average Price"] = result[0]
+        sample_metadata["Average Rating in Points"] = result[1]
     print(sample_metadata)
     return jsonify(sample_metadata)
 

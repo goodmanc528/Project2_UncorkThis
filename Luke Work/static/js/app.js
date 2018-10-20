@@ -1,18 +1,19 @@
-function buildMetadata(sample) {
+function buildMetadata(wines) {
   // @TODO: Complete the following function that builds the metadata panel
   // Use `d3.json` to fetch the metadata for a sample
-  var url = `/metadata/${sample}`;
+  var url = `/metadata/${wines}`;
     // Use d3 to select the panel with id of `#sample-metadata`
-    d3.json(url).then(function(sample) {
+    d3.json(url).then(function(wines) {
       var sample_metadata = d3.select("#sample-metadata");
     // Use `.html("") to clear any existing metadata
     sample_metadata.html("");
      // Use `Object.entries` to add each key and value pair to the panel
     // Hint: Inside the loop, you will need to use d3 to append new
     // tags for each key-value in the metadata.
-      Object.entries(sample).forEach(function ([key, value]){
+      Object.entries(wines).forEach(function ([key, value]){
       var row = sample_metadata.append("p");
       row.text(`${key}: ${value}`);
+    console.log(wines)
       });
     });
 };
@@ -41,7 +42,7 @@ function buildCharts(sample) {
       var data = [trace1];
 
       var layout = {
-        title: 'OTU ID',
+        title: 'Average Price',
         showlegend: false
         };
       
@@ -70,10 +71,10 @@ function buildCharts(sample) {
 };
 
 
-function optionChanged(newSample) {
+function optionChanged(newProvince) {
   // Fetch new data each time a new sample is selected
-  buildCharts(newSample);
-  buildMetadata(newSample);
+  buildCharts(newProvince);
+  buildMetadata(newProvince);
 };
 
 function init() {
