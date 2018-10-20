@@ -109,7 +109,8 @@ def samples(province):
     SELECT avg(wines.price) as averageprice, avg(wines.points) as points, provinces.province as province
     FROM wines INNER JOIN provinces
     ON wines.province_id = provinces.id
-    '''.format(province))
+    GROUP BY province
+    ''')
 
     df = pd.read_sql_query(sql_cmd, db.session.bind)
 
@@ -118,6 +119,7 @@ def samples(province):
         "Provinces": df["province"].values.tolist(),
         "Points": df["points"].values.tolist(),
     }
+    print(data)
     return jsonify(data)
 
 
