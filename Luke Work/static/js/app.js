@@ -17,17 +17,22 @@ function buildMetadata(wines) {
       });
     });
 };
-function buildCharts(wines) {
+function buildCharts(province) {
 
-  // @TODO: Use `d3.json` to fetch the sample data for the plots
-    var url = `/samples/${wines}`;
-    // @TODO: Build a Bubble Chart using the sample data
+    var url = `/samples/${province}`;
+
     d3.json(url).then(function(data) {
-      var bubX = data.points;
-      var bubY = data.price;
-      var m_size = data.price;
-      var m_color = data.points;
-      var textValue = data.varieties;
+      var xLength = [];
+      var provinceLength = data.Provinces;
+      for (i=0; i<provinceLength.length; i++){
+        xLength.push(i)
+      };
+      var bubX = data.Provinces;
+      var bubY = data.Prices;
+      var m_size = (parseInt(data.Points)-79);
+
+      console.log(m_size)
+      var textValue = data.Provinces;
       
       var trace1 = {
         x: bubX,
@@ -35,38 +40,24 @@ function buildCharts(wines) {
         text: textValue,
         mode: 'markers',
         marker: {
-          color: m_color,
           size: m_size,
         }
       };
       var data = [trace1];
 
       var layout = {
-        title: 'Wines & Stuff',
+        title: 'Average Price and Point by Province',
+        yaxis: {
+          "title": "Average Price"
+        },
+        xaxis: {
+          tickangle: 35, 
+        },
         showlegend: false
         };
-      
-
       Plotly.newPlot('bubble', data, layout);      
-
-    // @TODO: Build a Pie Chart
-    // HINT: You will need to use slice() to grab the top 10 price,
-    // points, and labels (10 each).
-
-    d3.json(url).then(function(data)  {
-      var pie_values = data.price.slice(0,10)
-      var pie_labels = data.points.slice(0,10)
-      var pie_hover = data.varieties.slice(0,10)
-      var data = [{
-        type: "pie",
-        hoverinfo: pie_hover,
-        values: pie_values,
-        labels: pie_labels,
-        }];
-  
-      Plotly.newPlot("pie", data);
-      });
     });
+
 };
 
 function optionChanged(newProvince) {
