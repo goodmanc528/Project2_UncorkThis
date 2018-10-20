@@ -101,22 +101,24 @@ def wine_data():
                       })
     return jsonify(wines)
 
-# @app.route("/samples/<sample>")
-# def samples(sample):
-#     """Return `otu_ids`, `otu_labels`,and `sample_values`."""
-#     stmt = db.session.query(Samples).statement
-#     df = pd.read_sql_query(stmt, db.session.bind)
 
-#     # Filter the data based on the sample number and
-#     # only keep rows with values above 1
-#     sample_data = df.loc[df[sample] > 1, ["otu_id", "otu_label", sample]]
-#     # Format the data to send as json
-#     data = {
-#         "otu_ids": sample_data.otu_id.values.tolist(),
-#         "sample_values": sample_data[sample].values.tolist(),
-#         "otu_labels": sample_data.otu_label.tolist(),
-#     }
-#     return jsonify(data)
+@app.route("/samples/<province>")
+def samples(province):
+
+    sql_cmd = sqlalchemy.text('''
+    SELECT avg(wines.price) as averageprice, avg(wines.points) as points, provinces.province as province
+    FROM wines INNER JOIN provinces
+    ON wines.province_id = provinces.id
+    '''.format(province))
+
+    df = pd.read_sql_query(sql_cmd, db.session.bind)
+
+    data = {
+        "Prices": df["averageprice"].values.tolist(),
+        "Provinces": df["province"].values.tolist(),
+        "Points": df["points"].values.tolist(),
+    }
+    return jsonify(data)
 
 
 if __name__ == "__main__":
