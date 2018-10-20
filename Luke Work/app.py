@@ -39,7 +39,7 @@ def index():
 
 @app.route("/map")
 def map():
-    """Return the homepage."""
+    """Show the interactive map."""
     return render_template("map.html")
 
 
@@ -80,6 +80,29 @@ def sample_metadata(province):
     return jsonify(sample_metadata)
 
 
+@app.route("/wines")
+def wine_data():
+
+    sql_cmd = sqlalchemy.text('''
+    SELECT wines.title, wines.points, wines.price, provinces.pro_lon, provinces.pro_lat
+    FROM wines INNER JOIN provinces
+    ON wines.province_id = provinces.id  
+    ''')
+    # results = db.session.query(*sql_cmd).filter(wines.province_id == province).all()
+    results = db.engine.execute(sql_cmd).fetchall()
+    print(results)
+
+    # Create a dictionary entry for each row of metadata information
+    wines = {}
+    for result in results:
+        wines["name"] = result[0]
+        wines["price"] = result[2]
+        wines["rating"] = result[1]
+        wines["lat"] = result[4]
+        wines["lon"] = result[3]
+    print(wines)
+    return jsonify(wines)
+
 # @app.route("/samples/<sample>")
 # def samples(sample):
 #     """Return `otu_ids`, `otu_labels`,and `sample_values`."""
@@ -96,6 +119,7 @@ def sample_metadata(province):
 #         "otu_labels": sample_data.otu_label.tolist(),
 #     }
 #     return jsonify(data)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
