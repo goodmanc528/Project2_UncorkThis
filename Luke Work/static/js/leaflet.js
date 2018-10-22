@@ -41,8 +41,8 @@ function createMap(layer, coords = parisCoords, zoom = mapZoomLevel) {
     // Create a baseMaps object to hold the basemaps
     var baseMaps = {
         "Street Map": streetmap,
-        "Pirate Map": piratemap,
-        "Satellite Map": satellitemap
+        "Satellite Map": satellitemap,
+        "Pirate Map": piratemap
     };
 
     // Create the map object with options
@@ -83,6 +83,7 @@ function createMap(layer, coords = parisCoords, zoom = mapZoomLevel) {
     };
 
     legend.addTo(myMap);
+
 }
 
 // colors for legend

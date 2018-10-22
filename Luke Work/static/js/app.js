@@ -19,7 +19,7 @@ function buildMetadata(wines) {
 };
 function buildCharts(province) {
   var url = `/samples/${province}`;
-    d3.json(url).then(function (data) {
+  d3.json(url).then(function (data) {
     // var xLength = [];
     // var provinceLength = data.Provinces;
     // for (i = 0; i < provinceLength.length; i++) {
@@ -28,7 +28,7 @@ function buildCharts(province) {
     var bubX = data.Points;
     var bubY = data.Prices;
     var rawCount = data.Count;
-    var allProvinces = data.Provinces;    
+    var allProvinces = data.Provinces;
     var adjCount = data.Count.map(function (e) {
       e = Math.log1p(e) * 2;
       return e;
@@ -40,13 +40,13 @@ function buildCharts(province) {
       return y;
     });
     console.log(color)
- 
+
     arrProvinceCounts = []
-    for (i=0; i < allProvinces.length; i++){
-      arrProvinceCounts.push({Province: allProvinces[i], Count: rawCount[i], Avg_Rating: bubX[i].toFixed(2), Avg_Price: bubY[i].toFixed(2)})
-    };    
-    
-    var textValue = arrProvinceCounts.map(province => `${province.Province} <br>No. of Wineries: ${province.Count}<br>Avg Rating ${province.Avg_Rating}<br>Avg Price ${province.Avg_Price}`);
+    for (i = 0; i < allProvinces.length; i++) {
+      arrProvinceCounts.push({ Province: allProvinces[i], Count: rawCount[i], Avg_Rating: bubX[i].toFixed(2), Avg_Price: bubY[i].toFixed(2) })
+    };
+
+    var textValue = arrProvinceCounts.map(province => `${province.Province} <br>No. of Wines: ${province.Count}<br>Avg Rating ${province.Avg_Rating}<br>Avg Price ${province.Avg_Price}`);
 
     var trace1 = {
       x: bubX,
@@ -78,7 +78,7 @@ function buildCharts(province) {
       hovermode: 'closest',
       autosize: false,
       showlegend: false,
-      width: 940,
+      width: 900,
       height: 600,
       margin: {
         l: 50,
@@ -90,9 +90,9 @@ function buildCharts(province) {
       paper_bgcolor: '#E1C56C',
       plot_bgcolor: '#FFFFFF'
     };
-    Plotly.newPlot('bubble', data, layout, {responsive: true}, );
+    Plotly.newPlot('bubble', data, layout, { responsive: true });
 
-  
+
 
     // var pieData = [{
     //   values: this,
@@ -103,10 +103,11 @@ function buildCharts(province) {
 };
 
 function buildCharts2(province) {
-  var url = `/samples2/${province}`
+  //version 2.0
+  //var url = `/samples2/${province}`
   // d3.json(url).then(function(province) {
-  return(url)
-  
+  //return(url)
+
   // })
 }
 
@@ -139,11 +140,11 @@ function init() {
 
 function getColor(d) {
   return d > 2000 ? '#0000FF' :
-      d > 1500 ? '#41D429' :
-          d > 500 ? '#FFF300' :
-              d > 250 ? '#FF8300' :
-                  d > 100 ? '#FF0000' :
-                      '#000000';
+    d > 1500 ? '#41D429' :
+      d > 500 ? '#FFF300' :
+        d > 250 ? '#FF8300' :
+          d > 100 ? '#FF0000' :
+            '#000000';
 }
 
 // Initialize the dashboard
