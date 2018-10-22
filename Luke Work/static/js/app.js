@@ -13,7 +13,7 @@ function buildMetadata(wines) {
     Object.entries(wines).forEach(function ([key, value]) {
       var row = sample_metadata.append("p");
       row.text(`${key}: ${value}`);
-      console.log(wines)
+      //console.log(wines)
     });
   });
 };
@@ -22,28 +22,50 @@ function buildCharts(province) {
   var url = `/samples/${province}`;
 
   d3.json(url).then(function (data) {
-    var xLength = [];
-    var provinceLength = data.Provinces;
-    for (i = 0; i < provinceLength.length; i++) {
-      xLength.push(i)
-    };
+    // var xLength = [];
+    // var provinceLength = data.Provinces;
+    // for (i = 0; i < provinceLength.length; i++) {
+    //   xLength.push(i)
+    // };
     var bubX = data.Points;
     var bubY = data.Prices;
+    var rawCount = data.Count;
+    var allProvinces = data.Provinces;
+    
     var adjCount = data.Count.map(function (e) {
       e = Math.log1p(e) * 2;
       return e;
     });
     var m_size = adjCount;
-
-    var textValue = data.Provinces;
+    // console.log(m_size)
+    var color = rawCount.map(function (x) {
+      y = getColor(x);
+      return y;
+    });
+    console.log(color)
+ 
+    arrProvinceCounts = []
+    for (i=0; i < allProvinces.length; i++){
+      arrProvinceCounts.push({Province: allProvinces[i], Count: rawCount[i], Avg_Rating: bubX[i].toFixed(2), Avg_Price: bubY[i].toFixed(2)})
+    };
+    
+    
+    
+    var textValue = arrProvinceCounts.map(province => `${province.Province} <br>No. of Wineries: ${province.Count}<br>Avg Rating ${province.Avg_Rating}<br>Avg Price ${province.Avg_Price}`);
 
     var trace1 = {
       x: bubX,
       y: bubY,
-      text: textValue,
+      hovertext: textValue,
+      hoverinfo: "text",
       mode: 'markers',
       marker: {
         size: m_size,
+        sizeref: .67,
+        sizemin: 1,
+        color: rawCount,
+        showscale: true,
+        colorscale: "Rainbow"
       }
     };
     var data = [trace1];
@@ -102,6 +124,15 @@ function init() {
     buildMetadata(firstSample);
   });
 };
+
+function getColor(d) {
+  return d > 2000 ? '#0000FF' :
+      d > 1500 ? '#41D429' :
+          d > 500 ? '#FFF300' :
+              d > 250 ? '#FF8300' :
+                  d > 100 ? '#FF0000' :
+                      '#000000';
+}
 
 // Initialize the dashboard
 init();
