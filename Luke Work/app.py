@@ -52,7 +52,7 @@ def names():
     df = pd.read_sql_query(stmt, db.session.bind)
     df.sort_values(by='province', ascending=True, inplace=True)
     print(df)
-    
+
     provinceVar = (df["province"].tolist())
     # print(provinceVar)
     return jsonify(provinceVar)
@@ -83,35 +83,35 @@ def sample_metadata(province):
     return jsonify(sample_metadata)
 
 
-@app.route("/wines/<province>")
-def wine_data():
-    # blocker
-    sql_cmd = sqlalchemy.text('''
-    SELECT wines.variety as variety, avg(wines.points) as rating, 
-    FROM wines INNER JOIN wineries
-    ON wines.winery_id = wineries.id
-    INNER JOIN provinces on 
-    GROUP BY variety
-    ''')
-    # results = db.session.query(*sql_cmd).filter(wines.province_id == province).all()
-    # results = db.engine.execute(sql_cmd).fetchall()
-    df = pd.read_sql_query(sql_cmd, db.session.bind)
+# @app.route("/wines/<province>")
+# def wine_data():
+#     # blocker
+#     sql_cmd = sqlalchemy.text('''
+#     SELECT wines.variety as variety, avg(wines.points) as rating,
+#     FROM wines INNER JOIN wineries
+#     ON wines.winery_id = wineries.id
+#     INNER JOIN provinces on
+#     GROUP BY variety
+#     ''')
+#     # results = db.session.query(*sql_cmd).filter(wines.province_id == province).all()
+#     # results = db.engine.execute(sql_cmd).fetchall()
+#     df = pd.read_sql_query(sql_cmd, db.session.bind)
 
-    # Create a dictionary entry for each row of metadata information
-    # wines = []
-    # for result in results:
-    #     wines.append({"name": result[0],
-    #                   "price": result[2],
-    #                   "rating": result[1],
-    #                   "lat": result[4],
-    #                   "lon": result[3]
-    #                   })
+#     # Create a dictionary entry for each row of metadata information
+#     # wines = []
+#     # for result in results:
+#     #     wines.append({"name": result[0],
+#     #                   "price": result[2],
+#     #                   "rating": result[1],
+#     #                   "lat": result[4],
+#     #                   "lon": result[3]
+#     #                   })
 
-    wines = {
-        "Variety": df["variety"].values.tolist(),
-        "Avg_Rating": df["rating"].values.tolist()
-    }
-    return jsonify(wines)
+#     wines = {
+#         "Variety": df["variety"].values.tolist(),
+#         "Avg_Rating": df["rating"].values.tolist()
+#     }
+#     return jsonify(wines)
 
 
 @app.route("/samples/<province>")
@@ -135,6 +135,7 @@ def samples(province):
     # print(data)
     return jsonify(data)
 
+
 @app.route("/samples2/<province>")
 def samples2(province):
     sql_cmd = sqlalchemy.text('''
@@ -145,8 +146,33 @@ def samples2(province):
     ''').params(n=province)
     df = pd.read_sql_query(sql_cmd, db.session.bind)
     print(df)
-    
+
     # return sql_cmd
+
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
+@app.route("/wines")
+def wine_data():
+    sql_cmd = sqlalchemy.text('''
+    SELECT wines.title, wines.points, wines.price, provinces.pro_lon, provinces.pro_lat
+    FROM wines INNER JOIN provinces
+    ON wines.province_id = provinces.id  
+    ''')
+    # results = db.session.query(*sql_cmd).filter(wines.province_id == province).all()
+    results = db.engine.execute(sql_cmd).fetchall()
+
+    # Create a dictionary entry for each row of metadata information
+    wineList = []
+    for result in results:
+        print(result)
+        wineList.append({"name": result[0],
+                         "price": result[2],
+                         "rating": result[1],
+                         "lat": result[4],
+                         "lon": result[3]
+                         })
+    print(wineList)
+    return jsonify(wineList)

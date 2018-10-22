@@ -4,6 +4,7 @@ var wines;
 // Perform a GET request to the query URL
 d3.json(queryUrl, function (data) {
     // Once we get a response, send the data object to the createMarkers function
+    console.log(data);
     createMarkers(data);
 });
 
