@@ -18,10 +18,8 @@ function buildMetadata(wines) {
   });
 };
 function buildCharts(province) {
-
   var url = `/samples/${province}`;
-
-  d3.json(url).then(function (data) {
+    d3.json(url).then(function (data) {
     // var xLength = [];
     // var provinceLength = data.Provinces;
     // for (i = 0; i < provinceLength.length; i++) {
@@ -30,8 +28,7 @@ function buildCharts(province) {
     var bubX = data.Points;
     var bubY = data.Prices;
     var rawCount = data.Count;
-    var allProvinces = data.Provinces;
-    
+    var allProvinces = data.Provinces;    
     var adjCount = data.Count.map(function (e) {
       e = Math.log1p(e) * 2;
       return e;
@@ -47,9 +44,7 @@ function buildCharts(province) {
     arrProvinceCounts = []
     for (i=0; i < allProvinces.length; i++){
       arrProvinceCounts.push({Province: allProvinces[i], Count: rawCount[i], Avg_Rating: bubX[i].toFixed(2), Avg_Price: bubY[i].toFixed(2)})
-    };
-    
-    
+    };    
     
     var textValue = arrProvinceCounts.map(province => `${province.Province} <br>No. of Wineries: ${province.Count}<br>Avg Rating ${province.Avg_Rating}<br>Avg Price ${province.Avg_Price}`);
 
@@ -96,9 +91,25 @@ function buildCharts(province) {
       plot_bgcolor: '#FFFFFF'
     };
     Plotly.newPlot('bubble', data, layout, {responsive: true}, );
+
+  
+
+    // var pieData = [{
+    //   values: this,
+    //   labels: arrSliceTen(variety)
+    // }]
   });
 
 };
+
+function buildCharts2(province) {
+  var url = `/samples2/${province}`
+  // d3.json(url).then(function(province) {
+  return(url)
+  
+  // })
+}
+
 
 function optionChanged(newProvince) {
   // Fetch new data each time a new sample is selected
