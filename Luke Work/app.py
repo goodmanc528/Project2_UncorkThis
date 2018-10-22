@@ -50,9 +50,11 @@ def names():
     # Use Pandas to perform the sql query
     stmt = db.session.query(provinces).statement
     df = pd.read_sql_query(stmt, db.session.bind)
-
+    df.sort_values(by='province', ascending=True, inplace=True)
+    print(df)
+    
     provinceVar = (df["province"].tolist())
-    print(provinceVar)
+    # print(provinceVar)
     return jsonify(provinceVar)
 
 
@@ -75,7 +77,7 @@ def sample_metadata(province):
         sample_metadata["Province"] = result[2]
         sample_metadata["Average Price"] = "$" + f"{result[0]:.2f}"
         sample_metadata["Average Rating in Points"] = f"{result[1]:.0f}"
-    print(sample_metadata)
+    # print(sample_metadata)
     return jsonify(sample_metadata)
 
 
@@ -120,7 +122,7 @@ def samples(province):
         "Points": df["points"].values.tolist(),
         "Count": df["count"].values.tolist(),
     }
-    print(data)
+    # print(data)
     return jsonify(data)
 
 

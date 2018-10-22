@@ -78,11 +78,12 @@ function buildCharts(province) {
       },
       xaxis: {
         tickangle: 35,
+        range: [82, 94]
       },
       hovermode: 'closest',
       autosize: false,
       showlegend: false,
-      width: 1200,
+      width: 940,
       height: 600,
       margin: {
         l: 50,
@@ -94,7 +95,7 @@ function buildCharts(province) {
       paper_bgcolor: '#E1C56C',
       plot_bgcolor: '#FFFFFF'
     };
-    Plotly.newPlot('bubble', data, layout);
+    Plotly.newPlot('bubble', data, layout, {responsive: true}, );
   });
 
 };
