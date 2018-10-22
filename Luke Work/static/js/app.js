@@ -78,7 +78,7 @@ function buildCharts(province) {
       hovermode: 'closest',
       autosize: false,
       showlegend: false,
-      width: 940,
+      width: 900,
       height: 600,
       margin: {
         l: 50,
@@ -90,7 +90,7 @@ function buildCharts(province) {
       paper_bgcolor: '#E1C56C',
       plot_bgcolor: '#FFFFFF'
     };
-    Plotly.newPlot('bubble', data, layout, {responsive: true}, );
+    Plotly.newPlot('bubble', data, layout, {responsive: true});
 
   
 
@@ -103,9 +103,10 @@ function buildCharts(province) {
 };
 
 function buildCharts2(province) {
-  var url = `/samples2/${province}`
+  //version 2.0
+  //var url = `/samples2/${province}`
   // d3.json(url).then(function(province) {
-  return(url)
+  //return(url)
   
   // })
 }
