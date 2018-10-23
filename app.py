@@ -27,10 +27,9 @@ Base = automap_base()
 Base.prepare(db.engine, reflect=True)
 
 # Save references to each table
-countries = Base.classes.countries
 provinces = Base.classes.provinces
-wineries = Base.classes.wineries
 wines = Base.classes.wines
+
 
 @app.route("/")
 def index():
@@ -38,73 +37,103 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/map")
+def map():
+    """Show the interactive map."""
+    return render_template("map.html")
+
+
 @app.route("/names")
 def names():
-    """Return a list of sample names."""
+    """Return a list of province names."""
 
     # Use Pandas to perform the sql query
-    stmt = db.session.query(wineries).statement
+    stmt = db.session.query(provinces).statement
     df = pd.read_sql_query(stmt, db.session.bind)
+    df.sort_values(by='province', ascending=True, inplace=True)
 
-    # Return a list of the column names (sample names)
-    return jsonify(list(df.rows)[1:])
+    provinceVar = (df["province"].tolist())
+    # print(provinceVar)
+    return jsonify(provinceVar)
 
 
-@app.route("/wineries")
-def sample_metadata():
+@app.route("/metadata/<province>")
+def sample_metadata(province):
+
+    # sql_cmd = sqlalchemy.text('''
+    # SELECT avg(wines.price) as averageprice, avg(wines.points) as points, provinces.province as province
+    # FROM wines INNER JOIN provinces
+    # ON wines.province_id = provinces.id
+    # WHERE provinces.province = "{}"
+    # GROUP BY province
+    # '''.format(province))
 
     sql_cmd = sqlalchemy.text('''
-    SELECT wineries.winery, wines.title
-    FROM wineries INNER JOIN wines 
-    ON wines.winery_id = wineries.id
-    ''')
-    results = db.execute(sql_cmd).fetchall()
-    print(results)
+    SELECT avg(wines.price) as averageprice, avg(wines.points) as points, provinces.province as province, countries.country as country
+    FROM wines INNER JOIN provinces
+    ON wines.province_id = provinces.id
+    INNER JOIN countries ON provinces.country_id = countries.id
+    WHERE provinces.province = "{}"
+    GROUP BY province    
+    '''.format(province))
 
-    """Return the MetaData for a given sample."""
-    sel = [
-        wineries.winery,
-        wineries.country_id,
-        wineries.province_id,
-        wines.winery_id,
-        wines.title,
-        wines.variety,
-        wines.price,
-        wines.points,
-    ]
+    results = db.engine.execute(sql_cmd).fetchall()
 
     # Create a dictionary entry for each row of metadata information
     sample_metadata = {}
     for result in results:
-        sample_metadata["Winery"] = result[1]
-        sample_metadata["Country ID"] = result[2]
-        sample_metadata["Province ID"] = result[3]
-        sample_metadata["Winery ID"] = result[4]
-        sample_metadata["Title"] = result[5]
-        sample_metadata["Variety"] = result[6]
-        sample_metadata["Price"] = result[7]
-        sample_metadata["Points"] = result[8]
-
+        sample_metadata["Province"] = result[2]
+        sample_metadata["Average Price"] = "$" + f"{result[0]:.2f}"
+        sample_metadata["Average Rating in Points"] = f"{result[1]:.0f}"
+        sample_metadata["Country"] = result[3]
     print(sample_metadata)
     return jsonify(sample_metadata)
 
 
-# @app.route("/samples/<sample>")
-# def samples(sample):
-#     """Return `otu_ids`, `otu_labels`,and `sample_values`."""
-#     stmt = db.session.query(Samples).statement
-#     df = pd.read_sql_query(stmt, db.session.bind)
+@app.route("/wines")
+def wine_data():
+    # blocker
+    sql_cmd = sqlalchemy.text('''
+    SELECT wines.title, wines.points, wines.price, provinces.pro_lon, provinces.pro_lat
+    FROM wines INNER JOIN provinces
+    ON wines.province_id = provinces.id  
+    ''')
+    # results = db.session.query(*sql_cmd).filter(wines.province_id == province).all()
+    results = db.engine.execute(sql_cmd).fetchall()
 
-#     # Filter the data based on the sample number and
-#     # only keep rows with values above 1
-#     sample_data = df.loc[df[sample] > 1, ["otu_id", "otu_label", sample]]
-#     # Format the data to send as json
-#     data = {
-#         "otu_ids": sample_data.otu_id.values.tolist(),
-#         "sample_values": sample_data[sample].values.tolist(),
-#         "otu_labels": sample_data.otu_label.tolist(),
-#     }
-#     return jsonify(data)
+    # Create a dictionary entry for each row of metadata information
+    wines = []
+    for result in results:
+        wines.append({"name": result[0],
+                      "price": result[2],
+                      "rating": result[1],
+                      "lat": result[4],
+                      "lon": result[3]
+                      })
+    return jsonify(wines)
 
-# if __name__ == "__main__":
-#     app.run()
+
+@app.route("/samples/<province>")
+def samples(province):
+
+    sql_cmd = sqlalchemy.text('''
+   SELECT avg(wines.price) as averageprice, avg(wines.points) as points, provinces.province as province, count(wines.points) as count
+   FROM wines INNER JOIN provinces
+   ON wines.province_id = provinces.id
+   GROUP BY province
+   ''')
+
+    df = pd.read_sql_query(sql_cmd, db.session.bind)
+
+    data = {
+        "Prices": df["averageprice"].values.tolist(),
+        "Provinces": df["province"].values.tolist(),
+        "Points": df["points"].values.tolist(),
+        "Count": df["count"].values.tolist(),
+    }
+    print(data)
+    return jsonify(data)
+
+
+if __name__ == "__main__":
+    app.run(debug=True)

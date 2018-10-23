@@ -1,79 +1,121 @@
-function buildMetadata(sample) {
+function buildMetadata(wines) {
   // @TODO: Complete the following function that builds the metadata panel
   // Use `d3.json` to fetch the metadata for a sample
-  var url = `/metadata/${sample}`;
-    // Use d3 to select the panel with id of `#sample-metadata`
-    d3.json(url).then(function(sample) {
-      var sample_metadata = d3.select("#sample-metadata");
+  var url = `/metadata/${wines}`;
+  // Use d3 to select the panel with id of `#sample-metadata`
+  d3.json(url).then(function (wines) {
+    var sample_metadata = d3.select("#sample-metadata");
     // Use `.html("") to clear any existing metadata
     sample_metadata.html("");
-     // Use `Object.entries` to add each key and value pair to the panel
+    // Use `Object.entries` to add each key and value pair to the panel
     // Hint: Inside the loop, you will need to use d3 to append new
     // tags for each key-value in the metadata.
-      Object.entries(sample).forEach(function ([key, value]){
+    Object.entries(wines).forEach(function ([key, value]) {
       var row = sample_metadata.append("p");
       row.text(`${key}: ${value}`);
-      });
+      //console.log(wines)
     });
+  });
 };
-function buildCharts(sample) {
-
-  // @TODO: Use `d3.json` to fetch the sample data for the plots
-    var url = `/samples/${sample}`;
-    // @TODO: Build a Bubble Chart using the sample data
-    d3.json(url).then(function(data) {
-      var bubX = data.otu_ids;
-      var bubY = data.sample_values;
-      var m_size = data.sample_values;
-      var m_color = data.otu_ids;
-      var textValue = data.otu_labels;
-      
-      var trace1 = {
-        x: bubX,
-        y: bubY,
-        text: textValue,
-        mode: 'markers',
-        marker: {
-          color: m_color,
-          size: m_size,
-        }
-      };
-      var data = [trace1];
-
-      var layout = {
-        title: 'OTU ID',
-        showlegend: false
-        };
-      
-
-      Plotly.newPlot('bubble', data, layout);      
-
-    // @TODO: Build a Pie Chart
-    // HINT: You will need to use slice() to grab the top 10 sample_values,
-    // otu_ids, and labels (10 each).
-
-    d3.json(url).then(function(data)  {
-      var pie_values = data.sample_values.slice(0,10)
-      var pie_labels = data.otu_ids.slice(0,10)
-      var pie_hover = data.otu_labels.slice(0,10)
-      var data = [{
-        type: "pie",
-        hoverinfo: pie_hover,
-        values: pie_values,
-        labels: pie_labels,
-        }];
-  
-      Plotly.newPlot("pie", data);
-      });
+function buildCharts(province) {
+  var url = `/samples/${province}`;
+  d3.json(url).then(function (data) {
+    // var xLength = [];
+    // var provinceLength = data.Provinces;
+    // for (i = 0; i < provinceLength.length; i++) {
+    //   xLength.push(i)
+    // };
+    var bubX = data.Points;
+    var bubY = data.Prices;
+    var rawCount = data.Count;
+    var allProvinces = data.Provinces;
+    var adjCount = data.Count.map(function (e) {
+      e = Math.log1p(e) * 2;
+      return e;
     });
-// ACTIVITY 15-2-7
+    var m_size = adjCount;
+    // console.log(m_size)
+    var color = rawCount.map(function (x) {
+      y = getColor(x);
+      return y;
+    });
+    console.log(color)
+
+    arrProvinceCounts = []
+    for (i = 0; i < allProvinces.length; i++) {
+      arrProvinceCounts.push({ Province: allProvinces[i], Count: rawCount[i], Avg_Rating: bubX[i].toFixed(2), Avg_Price: bubY[i].toFixed(2) })
+    };
+
+    var textValue = arrProvinceCounts.map(province => `${province.Province} <br>No. of Wines: ${province.Count}<br>Avg Rating ${province.Avg_Rating}<br>Avg Price ${province.Avg_Price}`);
+
+    var trace1 = {
+      x: bubX,
+      y: bubY,
+      hovertext: textValue,
+      hoverinfo: "text",
+      mode: 'markers',
+      marker: {
+        size: m_size,
+        sizeref: .67,
+        sizemin: 1,
+        color: rawCount,
+        showscale: true,
+        colorscale: "Rainbow"
+      }
+    };
+    var data = [trace1];
+
+    var layout = {
+      title: 'Average Price and Point by Province',
+      yaxis: {
+        "title": "Average Price",
+        range: [0, 100]
+      },
+      xaxis: {
+        tickangle: 35,
+        range: [82, 94]
+      },
+      hovermode: 'closest',
+      autosize: false,
+      showlegend: false,
+      width: 900,
+      height: 600,
+      margin: {
+        l: 50,
+        r: 50,
+        b: 100,
+        t: 100,
+        pad: 4
+      },
+      paper_bgcolor: '#E1C56C',
+      plot_bgcolor: '#FFFFFF'
+    };
+    Plotly.newPlot('bubble', data, layout, { responsive: true });
+
+
+
+    // var pieData = [{
+    //   values: this,
+    //   labels: arrSliceTen(variety)
+    // }]
+  });
+
 };
 
+function buildCharts2(province) {
+  //version 2.0
+  //var url = `/samples2/${province}`
+  // d3.json(url).then(function(province) {
+  //return(url)
 
-function optionChanged(newSample) {
+  // })
+}
+
+
+function optionChanged(newProvince) {
   // Fetch new data each time a new sample is selected
-  buildCharts(newSample);
-  buildMetadata(newSample);
+  buildCharts(newProvince);
+  buildMetadata(newProvince);
 };
 
 function init() {
@@ -95,6 +137,15 @@ function init() {
     buildMetadata(firstSample);
   });
 };
+
+function getColor(d) {
+  return d > 2000 ? '#0000FF' :
+    d > 1500 ? '#41D429' :
+      d > 500 ? '#FFF300' :
+        d > 250 ? '#FF8300' :
+          d > 100 ? '#FF0000' :
+            '#000000';
+}
 
 // Initialize the dashboard
 init();
